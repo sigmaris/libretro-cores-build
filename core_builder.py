@@ -5,9 +5,11 @@ from email import utils as email_utils
 import fnmatch
 import logging
 import os
+import pprint
 import shlex
 import string
 import subprocess
+import sys
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s [%(levelname)8s] %(message)s")
 
@@ -268,7 +270,6 @@ def main():
             not any(fnmatch.fnmatch(main_name, pattern) for pattern in includes)
             or any(fnmatch.fnmatch(main_name, pattern) for pattern in excludes)
         ):
-            logging.info("Skipping %s", main_name)
             continue
 
         logging.info("Building %s ...", main_name)
@@ -280,7 +281,8 @@ def main():
             logging.info("Successfully built %s", main_name)
 
     if failed_builds:
-        logging.error("Failed builds: %r", failed_builds)
+        logging.error("*** Failed builds ***")
+        pprint.pprint(failed_builds, stream=sys.stderr)
 
 
 if __name__ == "__main__":
