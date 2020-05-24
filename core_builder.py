@@ -158,11 +158,11 @@ def build_one_core(meta_dir, main_name, debian_name, distro):
     logging.info("Checking out %s", main_name)
     proc = subprocess.Popen(
         ("git", "clone", main_repo, main_name),
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
-    stdout, stderr = proc.communicate()
+    stdout, _ = proc.communicate()
     if proc.returncode != 0:
-        return (False, f"{main_name} checkout", stdout, stderr)
+        return (False, f"{main_name} checkout", stdout, None)
 
     # checkout debian repo into main repo debian directory
     main_dir = os.path.join(os.getcwd(), main_name)
@@ -170,12 +170,12 @@ def build_one_core(meta_dir, main_name, debian_name, distro):
     logging.info("Checking out %s", debian_name)
     proc = subprocess.Popen(
         ("git", "clone", debian_repo, "debian"),
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         cwd=main_dir
     )
-    stdout, stderr = proc.communicate()
+    stdout, _ = proc.communicate()
     if proc.returncode != 0:
-        return (False, f"{debian_name} checkout", stdout, stderr)
+        return (False, f"{debian_name} checkout", stdout, None)
 
     debian_dir = os.path.join(main_dir, "debian")
     if os.path.isdir(os.path.join(debian_dir, "debian")):
@@ -190,7 +190,7 @@ def build_one_core(meta_dir, main_name, debian_name, distro):
     stdout, stderr = proc.communicate()
     if proc.returncode != 0:
         return (False, f"Git log of {main_name}", stdout, stderr)
-    short_hash, long_hash, rfc2822_date = stdout.decode('utf-8').split(" ", 2)
+    short_hash, long_hash, rfc2822_date = stdout.decode().split(" ", 2)
     ts = email_utils.mktime_tz(email_utils.parsedate_tz(rfc2822_date))
     git_dt = datetime.utcfromtimestamp(ts)
     core_version = main_version.lower().lstrip(string.ascii_letters)
@@ -218,22 +218,22 @@ def build_one_core(meta_dir, main_name, debian_name, distro):
     proc = subprocess.Popen(
         ("mk-build-deps", "--install", "--tool",
          "apt-get -y -o Debug::pkgProblemResolver=yes --no-install-recommends"),
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         cwd=main_dir
     )
-    stdout, stderr = proc.communicate()
+    stdout, _ = proc.communicate()
     if proc.returncode != 0:
-        return (False, f"Installing build deps for {pkg_name}", stdout, stderr)
+        return (False, f"Installing build deps for {pkg_name}", stdout, None)
 
     logging.info("Building Debian package %s", pkg_name)
     proc = subprocess.Popen(
         ("dpkg-buildpackage", "-us", "-uc", "-b", "--jobs=auto"),
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         cwd=main_dir
     )
-    stdout, stderr = proc.communicate()
+    stdout, _ = proc.communicate()
     if proc.returncode != 0:
-        return (False, f"Building package {pkg_name}", stdout, stderr)
+        return (False, f"Building package {pkg_name}", stdout, None)
 
     return (True, None, None, None)
 
@@ -282,7 +282,13 @@ def main():
 
     if failed_builds:
         logging.error("*** Failed builds ***")
-        pprint.pprint(failed_builds, stream=sys.stderr)
+        for key, (out, stderr) in failed_builds.items():
+            logging.error("Failure in stage: %s", key)
+            for line in out.decode('utf-8', errors='ignore').splitlines():
+                logging.debug("out: %s", line)
+            if stderr:
+                for line in stderr.decode('utf-8', errors='ignore').splitlines():
+                    logging.debug("stderr: %s", line)
 
 
 if __name__ == "__main__":
