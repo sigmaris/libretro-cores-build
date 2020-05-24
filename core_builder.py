@@ -5,11 +5,9 @@ from email import utils as email_utils
 import fnmatch
 import logging
 import os
-import pprint
 import shlex
 import string
 import subprocess
-import sys
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s [%(levelname)8s] %(message)s")
 
