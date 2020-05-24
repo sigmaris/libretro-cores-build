@@ -1,18 +1,23 @@
 def main(ctx):
     return [
-        pipeline("bullseye", "computers", "81,atari800,blueMSX,CrocoDS,dosbox,fmsx,fs-uae,fuse,hatari,NP2,NP2kai,pcem,px68k,stella"),
-        pipeline("bullseye", "consoles", "4do,handy,o2em,prosystem,vecx,virtualjaguar"),
-        pipeline("bullseye", "misc", "2048,3dengine,Craft,Dinothawr,freej2me,gme,lutro,mrboom,nxengine,PocketCDG,prboom,scummvm,tyrquake,xrick"),
-        pipeline("bullseye", "beetle", "beetle*"),
-#        pipeline("bullseye", "mame", "mame"),
-        pipeline("bullseye", "fba", "fbalpha*"),
-        pipeline("bullseye", "nintendo", "bsnes,citra,desmume,dolphin,fceumm,gambatte,gpsp,gw,melonDS,meteor,mgba*,mupen64plus,nestopia,parallel-n64,PokeMini,QuickNES_Core,SameBoy,snes9x,snes9x2005,snes9x2010,tgbdual,vba-next,vbam"),
-        pipeline("bullseye", "sega", "Genesis-Plus-GX,flycast,PicoDrive,redream,reicast"),
-        pipeline("bullseye", "sony", "pcsx*,ppsspp"),
+        pipeline(ctx, "bullseye", "computers", "81,atari800,blueMSX,CrocoDS,dosbox,fmsx,fs-uae,fuse,hatari,NP2,NP2kai,pcem,px68k,stella"),
+        pipeline(ctx, "bullseye", "consoles", "4do,handy,o2em,prosystem,vecx,virtualjaguar"),
+        pipeline(ctx, "bullseye", "misc", "2048,3dengine,Craft,Dinothawr,freej2me,gme,lutro,mrboom,nxengine,PocketCDG,prboom,scummvm,tyrquake,xrick"),
+        pipeline(ctx, "bullseye", "beetle", "beetle*"),
+#        pipeline(ctx, "bullseye", "mame", "mame"),
+        pipeline(ctx, "bullseye", "fba", "fbalpha*"),
+        pipeline(ctx, "bullseye", "nintendo", "bsnes,citra,desmume,dolphin,fceumm,gambatte,gpsp,gw,melonDS,meteor,mgba*,mupen64plus,nestopia,parallel-n64,PokeMini,QuickNES_Core,SameBoy,snes9x,snes9x2005,snes9x2010,tgbdual,vba-next,vbam"),
+        pipeline(ctx, "bullseye", "sega", "Genesis-Plus-GX,flycast,PicoDrive,redream,reicast"),
+        pipeline(ctx, "bullseye", "sony", "pcsx*,ppsspp"),
     ]
 
 
-def pipeline(suite, name, pattern):
+def pipeline(ctx, suite, name, pattern):
+    if ctx.build.event == "tag" and "-pre" in ctx.build.ref:
+        prerelease = True
+    else:
+        prerelease = False
+
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -48,6 +53,7 @@ def pipeline(suite, name, pattern):
                     "api_key": {
                         "from_secret": "github_token",
                     },
+                    "prerelease": prerelease,
                     "files": [
                         "/drone/build/*.deb",
                         "/drone/build/*.buildinfo",
