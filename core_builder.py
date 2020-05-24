@@ -189,7 +189,7 @@ def build_one_core(meta_dir, main_name, debian_name, distro):
     )
     stdout, stderr = proc.communicate()
     if proc.returncode != 0:
-        return (False, "Git log", stdout, stderr)
+        return (False, f"Git log of {main_name}", stdout, stderr)
     short_hash, long_hash, rfc2822_date = stdout.decode('utf-8').split(" ", 2)
     ts = email_utils.mktime_tz(email_utils.parsedate_tz(rfc2822_date))
     git_dt = datetime.utcfromtimestamp(ts)
@@ -223,7 +223,7 @@ def build_one_core(meta_dir, main_name, debian_name, distro):
     )
     stdout, stderr = proc.communicate()
     if proc.returncode != 0:
-        return (False, "Installing build deps", stdout, stderr)
+        return (False, f"Installing build deps for {pkg_name}", stdout, stderr)
 
     logging.info("Building Debian package %s", pkg_name)
     proc = subprocess.Popen(
@@ -233,7 +233,7 @@ def build_one_core(meta_dir, main_name, debian_name, distro):
     )
     stdout, stderr = proc.communicate()
     if proc.returncode != 0:
-        return (False, "Building package", stdout, stderr)
+        return (False, f"Building package {pkg_name}", stdout, stderr)
 
     return (True, None, None, None)
 
