@@ -41,5 +41,22 @@ def pipeline(suite, name, pattern):
                     "python3 /drone/src/core_builder.py --include '%s' %s" % (pattern, suite),
                 ],
             },
+            {
+                "name": "publish",
+                "image": "plugins/github-release",
+                "settings": {
+                    "api_key": {
+                        "from_secret": "github_token",
+                    },
+                    "files": [
+                        "/drone/build/*.deb",
+                        "/drone/build/*.buildinfo",
+                    ],
+                },
+                "depends_on": ["build"],
+                "when": {
+                    "event": "tag",
+                },
+            },
         ],
     }
