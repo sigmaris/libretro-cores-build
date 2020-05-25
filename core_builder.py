@@ -155,7 +155,7 @@ def build_one_core(meta_dir, main_name, debian_name, distro):
     # checkout main repo
     logging.info("Checking out %s", main_name)
     proc = subprocess.Popen(
-        ("git", "clone", main_repo, main_name),
+        ("git", "clone", "--recurse-submodules", main_repo, main_name),
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
     stdout, _ = proc.communicate()
