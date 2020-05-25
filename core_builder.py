@@ -192,9 +192,10 @@ def build_one_core(meta_dir, main_name, debian_name, distro, build_number=1):
     short_hash, long_hash, rfc2822_date = stdout.decode().split(" ", 2)
     ts = email_utils.mktime_tz(email_utils.parsedate_tz(rfc2822_date))
     git_dt = datetime.utcfromtimestamp(ts)
-    core_version = main_version.lower().lstrip(string.ascii_letters).split()[0]
+    core_version = main_version.lower().lstrip(string.ascii_letters)
     if not core_version:
         core_version = "0.0.1"
+    core_version = core_version.split()[0]
     pkg_version = f"{core_version}+git{git_dt:%Y%m%d.%H%M}-{build_number}"
 
     with open(os.path.join(debian_dir, "changelog"), "r") as changelog_in:
