@@ -7,7 +7,7 @@ def main(ctx):
 #        pipeline(ctx, "bullseye", "mame", "mame"),
         pipeline(ctx, "bullseye", "fba", "fbalpha*"),
         pipeline(ctx, "bullseye", "nintendo", "bsnes*,citra,desmume,dolphin,fceumm,gambatte,gpsp,gw,melonDS,meteor,mgba*,mupen64plus,nestopia,parallel-n64,PokeMini,QuickNES_Core,SameBoy,snes9x,snes9x2005,snes9x2010,tgbdual,vba-next,vbam"),
-        pipeline(ctx, "bullseye", "sega", "Genesis-Plus-GX,flycast,PicoDrive,redream,reicast"),
+        pipeline(ctx, "bullseye", "sega", "Genesis-Plus-GX,flycast,PicoDrive,redream,reicast,yabause"),
         pipeline(ctx, "bullseye", "sony", "pcsx*,ppsspp"),
     ]
 
