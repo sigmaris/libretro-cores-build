@@ -30,7 +30,7 @@ DEBIAN_REPOS = (
     "beetle-wswan-debian",
     "blueMSX-debian",
     "bsnes-debian",
-    # "bsnes-mercury-debian",  # complicated packaging
+    "bsnes-mercury-debian",
     "citra-debian",
     "Craft-debian",
     # "crawl-ref-debian",  # complicated packaging
@@ -107,6 +107,7 @@ OVERRIDE_REPOS = {
     "mgba-libretro-debian": "https://github.com/mgba-emu/mgba.git"
 }
 OVERRIDE_CORE_SONAMES = {
+    'bsnes-mercury':     'bsnes_mercury_balanced',
     'beetle-bsnes':      'mednafen_snes',
     'beetle-gba':        'mednafen_gba',
     'beetle-lynx':       'mednafen_lynx',
