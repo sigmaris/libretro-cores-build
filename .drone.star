@@ -21,7 +21,7 @@ def pipeline(ctx, suite, name, pattern):
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "build_%s" % name,
+        "name": name,
         "platform": {
             "os": "linux",
             "arch": "arm64",
