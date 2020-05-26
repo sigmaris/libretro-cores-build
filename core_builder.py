@@ -11,100 +11,103 @@ import subprocess
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s [%(levelname)8s] %(message)s")
 
-DEBIAN_REPOS = (
-    "2048-debian",
-    "3dengine-debian",
-    "4do-debian",
-    "81-debian",
-    "atari800-debian",
-    "beetle-bsnes-debian",
-    "beetle-gba-debian",
-    "beetle-lynx-debian",
-    "beetle-ngp-debian",
-    "beetle-pce-fast-debian",
-    "beetle-pcfx-debian",
-    "beetle-psx-debian",
-    "beetle-saturn-debian",
-    "beetle-supergrafx-debian",
-    "beetle-vb-debian",
-    "beetle-wswan-debian",
-    "blueMSX-debian",
-    "bsnes-debian",
-    "bsnes-mercury-debian",
-    "citra-debian",
-    "Craft-debian",
-    # "crawl-ref-debian",  # complicated packaging
-    "CrocoDS-debian",
-    "desmume-debian",
-    "Dinothawr-debian",
-    "dolphin-debian",
-    "dosbox-debian",
-    # "fbalpha-debian",  # May have been renamed to fbneo? or just gone
-    "fbalpha2012-debian",
-    "fbalpha2012_cps1-debian",
-    "fbalpha2012_cps2-debian",
-    "fbalpha2012_cps3-debian",
-    "fceumm-debian",
-    "fmsx-debian",
-    "freej2me-debian",
-    "fs-uae-debian",
-    "fuse-debian",
-    "gambatte-debian",
-    "Genesis-Plus-GX-debian",
-    "gme-debian",
-    "gpsp-debian",
-    "gw-debian",
-    "handy-debian",
-    "hatari-debian",
-    "lutro-debian",
-    "mame-debian",
-    "mame2003-debian",
-    "mame2010-debian",
-    # "mame2014-debian",  # was renamed to "mame2015"
-    "mame2016-debian",
-    "melonDS-debian",
-    "meteor-debian",
-    # "mgba-libretro-debian",  # no display_version in info
-    "mrboom-debian",
-    # "mupen64plus-debian",  # may be renamed to "mupen64plus-next"
-    "nestopia-debian",
-    "NP2-debian",
-    "NP2kai-debian",
-    "nxengine-debian",
-    "o2em-debian",
-    "parallel-n64-debian",
-    "pcem-debian",
-    "pcsx1-debian",
-    "pcsx_rearmed-debian",
-    "PicoDrive-debian",
-    "PocketCDG-debian",
-    "PokeMini-debian",
-    "ppsspp-debian",
-    "prboom-debian",
-    "prosystem-debian",
-    # "PSP1-debian",  # info file not found?
-    "px68k-debian",
-    "QuickNES_Core-debian",
-    "redream-debian",
-    # "reicast-debian",  # info file not found, renamed to flycast?
-    "SameBoy-debian",
-    "scummvm-debian",
-    "snes9x-debian",
-    "snes9x2005-debian",
-    "snes9x2010-debian",
-    "stella-debian",
-    "tgbdual-debian",
-    "tyrquake-debian",
-    "vba-next-debian",
-    "vbam-debian",
-    "vecx-debian",
-    # "vice3.0-debian",  # not sure which of several info files to use
-    "virtualjaguar-debian",
-    "xrick-debian",
-    "yabause-debian",
+PROJECT_REPOS = (
+    "2048",
+    "3dengine",
+    "4do",
+    "81",
+    "atari800",
+    "beetle-bsnes",
+    "beetle-gba",
+    "beetle-lynx",
+    "beetle-ngp",
+    "beetle-pce-fast",
+    "beetle-pcfx",
+    "beetle-psx",
+    "beetle-saturn",
+    "beetle-supergrafx",
+    "beetle-vb",
+    "beetle-wswan",
+    "blueMSX",
+    "bsnes",
+    "bsnes-mercury",
+    "citra",
+    "Craft",
+    # "crawl-ref",  # complicated packaging
+    "CrocoDS",
+    "desmume",
+    "Dinothawr",
+    "dolphin",
+    "dosbox",
+    # "fbalpha",  # May have been renamed to fbneo? or just gone
+    "fbalpha2012",
+    "fbalpha2012_cps1",
+    "fbalpha2012_cps2",
+    "fbalpha2012_cps3",
+    "fceumm",
+    "fmsx",
+    "freej2me",
+    "fs-uae",
+    "fuse",
+    "gambatte",
+    "Genesis-Plus-GX",
+    "gme",
+    "gpsp",
+    "gw",
+    "handy",
+    "hatari",
+    "lutro",
+    "mame",
+    "mame2003",
+    "mame2010",
+    # "mame2014",  # was renamed to "mame2015"
+    "mame2016",
+    "melonDS",
+    "meteor",
+    # "mgba-libretro",  # no display_version in info
+    "mrboom",
+    # "mupen64plus",  # may be renamed to "mupen64plus-next"
+    "nestopia",
+    "NP2",
+    "NP2kai",
+    "nxengine",
+    "o2em",
+    "parallel-n64",
+    "pcem",
+    "pcsx1",
+    "pcsx_rearmed",
+    "PicoDrive",
+    "PocketCDG",
+    "PokeMini",
+    "ppsspp",
+    "prboom",
+    "prosystem",
+    # "PSP1",  # info file not found?
+    "px68k",
+    "QuickNES_Core",
+    "redream",
+    # "reicast",  # info file not found, renamed to flycast?
+    "SameBoy",
+    "scummvm",
+    "snes9x",
+    "snes9x2005",
+    "snes9x2010",
+    "stella",
+    "tgbdual",
+    "tyrquake",
+    "vba-next",
+    "vbam",
+    "vecx",
+    # "vice3.0",  # not sure which of several info files to use
+    "virtualjaguar",
+    "xrick",
+    "yabause",
 )
 OVERRIDE_REPOS = {
-    "mgba-libretro-debian": "https://github.com/mgba-emu/mgba.git"
+    "mgba-libretro": "https://github.com/mgba-emu/mgba.git"
+}
+OVERRIDE_DEBIAN_REPOS = {
+    "beetle-saturn": "https://github.com/sigmaris/beetle-saturn-debian.git"
 }
 OVERRIDE_CORE_SONAMES = {
     'bsnes-mercury':     'bsnes_mercury_balanced',
@@ -141,8 +144,8 @@ CHANGELOG_TEMPLATE = """{package} ({version}) {distributions}; urgency=low
 
 
 def build_one_core(meta_dir, main_name, debian_name, distro, build_number=1):
-    if debian_name in OVERRIDE_REPOS:
-        main_repo = OVERRIDE_REPOS[debian_name]
+    if main_name in OVERRIDE_REPOS:
+        main_repo = OVERRIDE_REPOS[main_name]
     else:
         main_repo = "/".join((LIBRETRO_GIT_URL_BASE, main_name))
 
@@ -165,7 +168,12 @@ def build_one_core(meta_dir, main_name, debian_name, distro, build_number=1):
 
     # checkout debian repo into main repo debian directory
     main_dir = os.path.join(os.getcwd(), main_name)
-    debian_repo = "/".join((LIBRETRO_GIT_URL_BASE, debian_name))
+
+    if main_name in OVERRIDE_DEBIAN_REPOS:
+        debian_repo = OVERRIDE_DEBIAN_REPOS[main_name]
+    else:
+        debian_repo = "/".join((LIBRETRO_GIT_URL_BASE, debian_name))
+
     logging.info("Checking out %s", debian_name)
     proc = subprocess.Popen(
         ("git", "clone", debian_repo, "debian"),
@@ -263,8 +271,8 @@ def main():
 
     subprocess.check_call(("git", "clone", META_REPO))
     meta_dir = os.path.join(os.getcwd(), "libretro-super")
-    for index, debian_name in enumerate(DEBIAN_REPOS):
-        main_name = debian_name.rsplit("-", 1)[0]
+    for index, main_name in enumerate(PROJECT_REPOS):
+        debian_name = f"{main_name}-debian"
 
         if (
             not any(fnmatch.fnmatch(main_name, pattern) for pattern in includes)
