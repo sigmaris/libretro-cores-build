@@ -109,7 +109,7 @@ OVERRIDE_REPOS = {
 }
 OVERRIDE_DEBIAN_REPOS = {
     "beetle-saturn": "https://github.com/sigmaris/beetle-saturn-debian.git",
-    "pcsx-rearmed": "https://github.com/sigmaris/pcsx_rearmed-debian.git",
+    "pcsx_rearmed": "https://github.com/sigmaris/pcsx_rearmed-debian.git",
     "fbneo": "https://github.com/sigmaris/fbneo-debian.git"
 }
 OVERRIDE_CORE_SONAMES = {
