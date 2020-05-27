@@ -107,7 +107,8 @@ OVERRIDE_REPOS = {
     "mgba-libretro": "https://github.com/mgba-emu/mgba.git"
 }
 OVERRIDE_DEBIAN_REPOS = {
-    "beetle-saturn": "https://github.com/sigmaris/beetle-saturn-debian.git"
+    "beetle-saturn": "https://github.com/sigmaris/beetle-saturn-debian.git",
+    "pcsx-rearmed": "https://github.com/sigmaris/pcsx_rearmed-debian.git",
 }
 OVERRIDE_CORE_SONAMES = {
     'bsnes-mercury':     'bsnes_mercury_balanced',
