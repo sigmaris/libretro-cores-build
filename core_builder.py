@@ -39,7 +39,7 @@ PROJECT_REPOS = (
     "Dinothawr",
     "dolphin",
     "dosbox",
-    # "fbalpha",  # May have been renamed to fbneo? or just gone
+    "fbneo",
     "fbalpha2012",
     "fbalpha2012_cps1",
     "fbalpha2012_cps2",
@@ -104,11 +104,13 @@ PROJECT_REPOS = (
     "yabause",
 )
 OVERRIDE_REPOS = {
-    "mgba-libretro": "https://github.com/mgba-emu/mgba.git"
+    "mgba-libretro": "https://github.com/mgba-emu/mgba.git",
+    "fbneo": "https://github.com/libretro/FBNeo.git"
 }
 OVERRIDE_DEBIAN_REPOS = {
     "beetle-saturn": "https://github.com/sigmaris/beetle-saturn-debian.git",
     "pcsx-rearmed": "https://github.com/sigmaris/pcsx_rearmed-debian.git",
+    "fbneo": "https://github.com/sigmaris/fbneo-debian.git"
 }
 OVERRIDE_CORE_SONAMES = {
     'bsnes-mercury':     'bsnes_mercury_balanced',
