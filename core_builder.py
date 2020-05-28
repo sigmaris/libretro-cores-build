@@ -209,6 +209,15 @@ def build_one_core(meta_dir, main_name, debian_name, distro, build_number=1):
     core_version = core_version.split()[0]
     pkg_version = f"{core_version}+git{git_dt:%Y%m%d.%H%M}-{build_number}"
 
+    patches_dir = os.path.join(os.path.dirname(__file__), "patches")
+    core_patch_dir = os.path.join(patches_dir, main_name)
+    if os.path.isdir(core_patch_dir):
+        for patch in os.listdir(core_patch_dir):
+            subprocess.check_call(
+                ("git", "am", os.path.join(core_patch_dir, patch)),
+                cwd=main_dir
+            )
+
     with open(os.path.join(debian_dir, "changelog"), "r") as changelog_in:
         chlog_existing = changelog_in.read()
         pkg_name = chlog_existing.split()[0]
@@ -221,9 +230,7 @@ def build_one_core(meta_dir, main_name, debian_name, distro, build_number=1):
         changelog_out.write(chlog_existing)
 
     # Build the package!
-    logging.info("*** %s build deps ***", pkg_name)
     subprocess.call(("dpkg-checkbuilddeps",), cwd=main_dir)
-    logging.info("*** %s build deps end ***", pkg_name)
 
     logging.info("Installing build deps for %s", pkg_name)
     proc = subprocess.Popen(
