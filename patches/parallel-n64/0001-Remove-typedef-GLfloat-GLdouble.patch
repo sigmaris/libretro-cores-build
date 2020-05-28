@@ -1,0 +1,25 @@
+From f9471355f1ca0fb4428ccc8606249f3c63a46d00 Mon Sep 17 00:00:00 2001
+From: root <root@localhost>
+Date: Thu, 28 May 2020 18:59:30 +0000
+Subject: [PATCH] Remove typedef GLfloat GLdouble
+
+This conflicts with the typedef in Mesa.
+---
+ libretro-common/include/glsm/glsm.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/libretro-common/include/glsm/glsm.h b/libretro-common/include/glsm/glsm.h
+index 9113bdc9..7ff14bd1 100644
+--- a/libretro-common/include/glsm/glsm.h
++++ b/libretro-common/include/glsm/glsm.h
+@@ -32,7 +32,6 @@
+ RETRO_BEGIN_DECLS
+ 
+ #ifdef HAVE_OPENGLES2
+-typedef GLfloat GLdouble;
+ typedef GLclampf GLclampd;
+ #endif
+ 
+-- 
+2.26.2
+
