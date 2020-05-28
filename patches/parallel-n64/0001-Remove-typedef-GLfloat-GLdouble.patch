@@ -1,5 +1,5 @@
 From f9471355f1ca0fb4428ccc8606249f3c63a46d00 Mon Sep 17 00:00:00 2001
-From: root <root@localhost>
+From: Hugh Cole-Baker <sigmaris@gmail.com>
 Date: Thu, 28 May 2020 18:59:30 +0000
 Subject: [PATCH] Remove typedef GLfloat GLdouble
 
