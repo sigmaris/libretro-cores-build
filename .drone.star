@@ -43,7 +43,7 @@ def pipeline(ctx, suite, name, pattern):
                 "commands": [
                     "mkdir /drone/build",
                     "cd /drone/build",
-                    "python3 /drone/src/core_builder.py --include '%s' %s" % (pattern, suite),
+                    "python3 /drone/src/core_builder.py --build-number $DRONE_BUILD_NUMBER --include '%s' %s" % (pattern, suite),
                 ],
             },
             {

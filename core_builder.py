@@ -146,7 +146,7 @@ CHANGELOG_TEMPLATE = """{package} ({version}) {distributions}; urgency=low
 """
 
 
-def build_one_core(meta_dir, main_name, debian_name, distro, build_number=1):
+def build_one_core(meta_dir, main_name, debian_name, distro, build_number):
     if main_name in OVERRIDE_REPOS:
         main_repo = OVERRIDE_REPOS[main_name]
     else:
@@ -273,6 +273,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--include', help='Only include cores matching these patterns')
     parser.add_argument('--exclude', help='Exclude cores matching these patterns')
+    parser.add_argument('--build-number', default=1, type=int, help='.deb package build number')
     parser.add_argument('distro', help='Distribution codename')
     args = parser.parse_args()
     includes = args.include.split(',') if args.include else ["*"]
@@ -291,7 +292,7 @@ def main():
             continue
 
         logging.info("Building %s ...", main_name)
-        success, stage, stdout, stderr = build_one_core(meta_dir, main_name, debian_name, args.distro)
+        success, stage, stdout, stderr = build_one_core(meta_dir, main_name, debian_name, args.distro, args.build_number)
         if not success:
             logging.error("Failed to build %s", main_name)
             failed_builds[stage] = (stdout, stderr)
