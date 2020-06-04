@@ -112,8 +112,10 @@ OVERRIDE_DEBIAN_REPOS = {
     "pcsx_rearmed": "https://github.com/sigmaris/pcsx_rearmed-debian.git",
     "fbneo": "https://github.com/sigmaris/fbneo-debian.git",
     "NP2kai": "https://github.com/sigmaris/NP2kai-debian.git",
+    "bsnes": "https://github.com/sigmaris/bsnes2014-debian.git",
 }
 OVERRIDE_CORE_SONAMES = {
+    'bsnes':             'bsnes2014_balanced',
     'bsnes-mercury':     'bsnes_mercury_balanced',
     'beetle-bsnes':      'mednafen_snes',
     'beetle-gba':        'mednafen_gba',
