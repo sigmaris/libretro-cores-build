@@ -135,6 +135,7 @@ OVERRIDE_CORE_SONAMES = {
     'stella':            'stella2014',
     'vba-next':          'vba_next',
     'pcsx-rearmed':      'pcsx_rearmed',
+    'redream':           'retrodream',
 }
 META_REPO = "https://github.com/libretro/libretro-super.git"
 LIBRETRO_GIT_URL_BASE = "git://git.launchpad.net/~libretro/libretro/+git"
