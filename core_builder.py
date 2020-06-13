@@ -112,6 +112,7 @@ OVERRIDE_DEBIAN_REPOS = {
     "bsnes": "https://github.com/sigmaris/bsnes2014-debian.git",
     "fbneo": "https://github.com/sigmaris/fbneo-debian.git",
     "NP2kai": "https://github.com/sigmaris/NP2kai-debian.git",
+    "parallel-n64": "https://github.com/sigmaris/parallel-n64-debian.git",
     "pcsx_rearmed": "https://github.com/sigmaris/pcsx_rearmed-debian.git",
     "ppsspp": "https://github.com/sigmaris/ppsspp-debian.git",
 }
