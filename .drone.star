@@ -58,6 +58,7 @@ def pipeline(ctx, suite, name, pattern):
                     "files": [
                         "/drone/build/*.deb",
                         "/drone/build/*.buildinfo",
+                        "/drone/build/*.changes",
                     ],
                 },
                 "depends_on": ["build"],
