@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import argparse
+import ctypes
 from datetime import datetime
 from email import utils as email_utils
 import fnmatch
+import glob
 import logging
 import os
 import shlex
@@ -152,6 +154,17 @@ CHANGELOG_TEMPLATE = """{package} ({version}) {distributions}; urgency=low
 """
 
 
+class RetroSystemInfo(ctypes.Structure):
+    """ struct retro_system_type """
+    _fields_ = [
+        ('library_name', ctypes.c_char_p),
+        ('library_version', ctypes.c_char_p),
+        ('valid_extensions', ctypes.c_char_p),
+        ('need_fullpath', ctypes.c_bool),
+        ('block_extract', ctypes.c_bool)
+    ]
+
+
 def build_one_core(meta_dir, main_name, debian_name, distro, build_number):
     if main_name in OVERRIDE_REPOS:
         main_repo = OVERRIDE_REPOS[main_name]
@@ -162,8 +175,8 @@ def build_one_core(meta_dir, main_name, debian_name, distro, build_number):
         meta_name = OVERRIDE_CORE_SONAMES[main_name]
     else:
         meta_name = main_name.lower()
-    main_version = get_meta_version(meta_dir, meta_name)
-    logging.info("Core %s at version %s", main_name, main_version)
+    meta_version = get_meta_version(meta_dir, meta_name)
+    logging.info("Core %s at version %s", main_name, meta_version)
 
     # checkout main repo
     logging.info("Checking out %s", main_name)
@@ -209,11 +222,7 @@ def build_one_core(meta_dir, main_name, debian_name, distro, build_number):
     short_hash, long_hash, rfc2822_date = stdout.decode().split(" ", 2)
     ts = email_utils.mktime_tz(email_utils.parsedate_tz(rfc2822_date))
     git_dt = datetime.utcfromtimestamp(ts)
-    core_version = main_version.lower().lstrip(string.ascii_letters)
-    if not core_version:
-        core_version = "0.0.1"
-    core_version = core_version.split()[0]
-    pkg_version = f"{core_version}+git{git_dt:%Y%m%d.%H%M}-{build_number}"
+    pkg_version = deb_version(meta_version, git_dt, short_hash, build_number)
 
     patches_dir = os.path.join(os.path.dirname(__file__), "patches")
     core_patch_dir = os.path.join(patches_dir, main_name)
@@ -259,7 +268,114 @@ def build_one_core(meta_dir, main_name, debian_name, distro, build_number):
     if proc.returncode != 0:
         return (False, f"Building package {pkg_name}", stdout, None)
 
+    packages = identify_packages(debian_dir)
+    return fixup_versions(packages, meta_version, git_dt, short_hash, build_number)
+
+
+def deb_version(meta_version, git_dt, short_hash, build_number):
+    core_version = meta_version.lower().lstrip(string.ascii_letters)
+    if not core_version:
+        core_version = "0.0.1"
+    core_version = core_version.split()[0]
+
+    return f"{core_version}-r{git_dt:%Y%m%d.%H%M}-{short_hash}-{build_number}"
+
+
+def identify_packages(debian_dir):
+    packages = []
+    with open(os.path.join(debian_dir, 'control')) as controlfile:
+        for line in controlfile:
+            if line.strip().startswith("Package: "):
+                packages.append(line.split(':')[1].strip())
+    return packages
+
+
+def fixup_versions(packages, meta_version, git_dt, short_hash, build_number):
+    pkg_version = deb_version(meta_version, git_dt, short_hash, build_number)
+
+    for package in packages:
+        pkg_file = f"{package}_{pkg_version}_arm64.deb"
+        if os.path.isfile(pkg_file):
+            unpack_dir = f"{package}-unpack"
+
+            proc = subprocess.Popen(
+                ("dpkg-deb", "-R", pkg_file, unpack_dir),
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            )
+            stdout, _ = proc.communicate()
+            if proc.returncode != 0:
+                return (False, f"Unpacking package {package}", stdout, None)
+
+            so_file = next(glob.iglob(
+                os.path.join(unpack_dir, "usr/lib/aarch64-linux-gnu/libretro", "*_libretro.so")
+            ))
+
+            lib = ctypes.cdll.LoadLibrary(so_file)
+
+            retro_get_system_info = lib.retro_get_system_info
+            retro_get_system_info.argtypes = [ctypes.POINTER(RetroSystemInfo)]
+            retro_get_system_info.restype = None
+
+            system_info = RetroSystemInfo()
+            retro_get_system_info(ctypes.byref(system_info))
+            if system_info.library_version is None:
+                logging.warning("%s has NULL library_version", so_file)
+                continue
+
+            real_version = str(system_info.library_version, 'utf-8')
+
+            if real_version.strip().endswith(short_hash):
+                real_version = real_version.strip()[:-len(short_hash)].strip()
+
+            if meta_version != real_version:
+                real_pkg_version = deb_version(real_version, git_dt, short_hash, build_number)
+                logging.info("%s version fixup %s -> %s", package, pkg_version, real_pkg_version)
+                version_change(package, unpack_dir, pkg_version, real_pkg_version)
+
+                dbgsym_pkg_file = f"{package}-dbgsym_{pkg_version}_arm64.deb"
+                dbg_unpack_dir = f"{package}-dbgsym-unpack"
+
+                if os.path.isfile(dbgsym_pkg_file):
+
+                    proc = subprocess.Popen(
+                        ("dpkg-deb", "-R", dbgsym_pkg_file, dbg_unpack_dir),
+                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                    )
+                    stdout, _ = proc.communicate()
+                    if proc.returncode != 0:
+                        return (False, f"Unpacking package {package}-dbgsym", stdout, None)
+
+                    version_change(f"{package}-dbgsym", dbg_unpack_dir, pkg_version, real_pkg_version)
+
     return (True, None, None, None)
+
+
+def version_change(package, unpack_dir, old_version, new_version):
+    repack_dir = f"{package}-repack"
+
+    with open(os.path.join(unpack_dir, "DEBIAN", "control"), "r") as control_in:
+        control_content = control_in.read()
+        control_modified_lines = []
+        for line in control_content.splitlines(keepends=True):
+            if line.strip() == f"Version: {old_version}":
+                control_modified_lines.append(f"Version: {new_version}\n")
+            else:
+                control_modified_lines.append(line)
+    with open(os.path.join(unpack_dir, "DEBIAN", "control"), "w") as control_out:
+        control_out.write("".join(control_modified_lines))
+
+    os.mkdir(repack_dir)
+    proc = subprocess.Popen(
+        ("dpkg-deb", "-b", unpack_dir, repack_dir),
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    )
+    stdout, _ = proc.communicate()
+    if proc.returncode != 0:
+        return (False, f"Repacking package {package}", stdout, None)
+
+    new_pkg_file = f"{package}_{new_version}_arm64.deb"
+    os.rename(os.path.join(repack_dir, new_pkg_file), new_pkg_file)
+    os.remove(f"{package}_{old_version}_arm64.deb")
 
 
 def get_meta_version(meta_dir, meta_name):

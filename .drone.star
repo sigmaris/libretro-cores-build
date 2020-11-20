@@ -40,7 +40,7 @@ def pipeline(ctx, suite, name, pattern):
         "steps": [
             {
                 "name": "build",
-                "image": "sigmaris/libretrobuilder:%s" % suite,
+                "image": "ghcr.io/sigmaris/libretrobuilder:%s" % suite,
                 "commands": [
                     "mkdir /drone/build",
                     "cd /drone/build",
