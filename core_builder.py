@@ -306,11 +306,15 @@ def fixup_versions(packages, meta_version, git_dt, short_hash, build_number):
             if proc.returncode != 0:
                 return (False, f"Unpacking package {package}", stdout, None)
 
-            so_file = next(glob.iglob(
-                os.path.join(unpack_dir, "usr/lib/aarch64-linux-gnu/libretro", "*_libretro.so")
-            ))
+            try:
+                so_file = next(glob.iglob(
+                    os.path.join(unpack_dir, "usr/lib/aarch64-linux-gnu/libretro", "*_libretro.so")
+                ))
 
-            lib = ctypes.cdll.LoadLibrary(so_file)
+                lib = ctypes.cdll.LoadLibrary(so_file)
+            except Exception as exc:
+                logging.exception(f"Exception finding or opening .so file: {exc}")
+                continue
 
             retro_get_system_info = lib.retro_get_system_info
             retro_get_system_info.argtypes = [ctypes.POINTER(RetroSystemInfo)]
