@@ -273,7 +273,7 @@ def build_one_core(meta_dir, main_name, debian_name, distro, build_number):
 
 
 def deb_version(meta_version, git_dt, short_hash, build_number):
-    core_version = meta_version.lower().lstrip(string.ascii_letters)
+    core_version = meta_version.lower().lstrip(string.ascii_letters).strip(string.punctuation)
     if not core_version:
         core_version = "0.0.1"
     core_version = core_version.split()[0]
@@ -331,8 +331,9 @@ def fixup_versions(packages, meta_version, git_dt, short_hash, build_number):
             if real_version.strip().endswith(short_hash):
                 real_version = real_version.strip()[:-len(short_hash)].strip()
 
-            if meta_version != real_version:
-                real_pkg_version = deb_version(real_version, git_dt, short_hash, build_number)
+            real_pkg_version = deb_version(real_version, git_dt, short_hash, build_number)
+
+            if pkg_version != real_pkg_version:
                 logging.info("%s version fixup %s -> %s", package, pkg_version, real_pkg_version)
                 version_change(package, unpack_dir, pkg_version, real_pkg_version)
 
