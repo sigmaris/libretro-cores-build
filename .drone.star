@@ -50,7 +50,7 @@ def pipeline(ctx, suite, name, pattern):
             },
             {
                 "name": "publish",
-                "image": "plugins/github-release",
+                "image": "ghcr.io/sigmaris/drone-github-release:latest",
                 "settings": {
                     "api_key": {
                         "from_secret": "github_token",
